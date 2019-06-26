@@ -1,0 +1,29 @@
+Written in C as some fun. 
+ATM code to generate $20/$50 bills from a user input. Reject if less than $20 or if not a divisible of 20/50 (the $30 quandry)
+
+#include "stdio.h"
+#include "conio.h"
+ 
+int value,rem,bill_50,bill_20;
+ 
+void main() {
+   printf ("Enter the amount");
+   scanf("%d",&value);
+ 
+   if(((value%20)==0) && (value>0)){
+      if(value>=50) {
+         bill_50 = value/50;
+         value = value%50;
+         printf ("No of 50 Bills is %d \n",bill_50);
+      }
+      if((value>=20) && (value<50)) {
+         bill_20 = value/20;
+         value = value%20;
+         printf ("No of 20 Bills is %d \n",bill_20);
+      }
+   }
+   else  {
+      printf ("This machine only dispenses $20 and $50 notes");
+   }
+   getch();
+}
