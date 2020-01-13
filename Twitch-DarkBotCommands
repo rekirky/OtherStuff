@@ -1,0 +1,17 @@
+Twitch DarkBot Commands
+
+User Profile Config # Done for Beasts of Tap clan (change BoT in Clan Tag to suit)
+Max Stage                       d?save ms max <level>
+Build                           d?save Build <cs, sc, hs, pet>
+Gold                            d?save Gold <fairy, phom, chesterson, boss>
+Last Hero                       d?save lasthero <name>
+Ascension                       d?save Ascension <0-3>
+Raid Level                      d?save raidlevel <number>
+Scroll                          d?save heroscroll <number>
+Weapon                          d?save heroweapon <number>
+Lifetime Relics                 d?save LTR <number>
+Undisputed wins                 d?save undisputed <number>
+Clan Tag                        d?save clanacronym BoT
+Background                      d?save background <default, knight, warlord, sorcerer, rogue>
+
+View profile                    d?profile
