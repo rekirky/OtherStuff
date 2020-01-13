@@ -4,4 +4,4 @@
 General Items
 
 Title : Coresoft - JSS Check - Output Filenames
-Description : Used to check the last log file times for running services on JSS server
+Description : Used to check the last log file times for running services on JSS
