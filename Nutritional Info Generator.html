@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Info Generator</title>
+    <script>
+        function updateTable() {
+            let servingSize = parseFloat(document.getElementById('servingSize').value) || 1;
+            let rows = document.querySelectorAll('.nutrient-row');
+            
+            rows.forEach(row => {
+                let per100g = parseFloat(row.querySelector('.per-100g-input').value) || 0;
+                let perServing = (per100g * servingSize) / 100;
+                row.querySelector('.per-serving').textContent = perServing.toFixed(1);
+            });
+        }
+
+        function exportSVG() {
+            let svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+            <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">
+                <rect width="400" height="300" fill="white" stroke="black" stroke-width="2" />
+                <text x="50%" y="30" font-family="Arial" font-size="16" font-weight="bold" fill="black" text-anchor="middle">Nutrition Information</text>
+                <text x="20" y="60" font-family="Arial" font-size="14">Servings per package: ${document.getElementById('servingsPerPackage').value}</text>
+                <text x="20" y="80" font-family="Arial" font-size="14">Serving size: ${document.getElementById('servingSize').value}g</text>
+                <line x1="20" y1="85" x2="380" y2="85" stroke="black" stroke-width="1" />
+                <text x="20" y="110" font-family="Arial" font-size="14" font-weight="bold">Nutrient</text>
+                <text x="150" y="110" font-family="Arial" font-size="14" font-weight="bold">Avg. Quantity</text>
+                <text x="270" y="110" font-family="Arial" font-size="14" font-weight="bold">Avg. Quantity</text>
+                
+                <text x="150" y="125" font-family="Arial" font-size="14" font-weight="bold">Per Serving</text>
+                <text x="270" y="125" font-family="Arial" font-size="14" font-weight="bold">Per 100g</text>
+                <line x1="20" y1="135" x2="380" y2="135" stroke="black" stroke-width="1" />
+            `;
+            
+            let yPosition = 150;
+            document.querySelectorAll('.nutrient-row').forEach(row => {
+                let nutrient = row.querySelector('.nutrient-name').value || "";
+                let unit = row.querySelector('.unit-input').value || "";
+                let per100g = row.querySelector('.per-100g-input').value || "0";
+                let perServing = row.querySelector('.per-serving').textContent;
+                
+                svgContent += `
+                <text x="20" y="${yPosition}" font-family="Arial" font-size="14">${nutrient}</text>
+                <text x="150" y="${yPosition}" font-family="Arial" font-size="14">${perServing} ${unit}</text>
+                <text x="270" y="${yPosition}" font-family="Arial" font-size="14">${per100g} ${unit}</text>
+                `;
+                yPosition += 20;
+            });
+            
+            svgContent += "</svg>";
+            
+            let blob = new Blob([svgContent], { type: "image/svg+xml" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "nutrition_info.svg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { border-collapse: collapse; width: 100%; max-width: 400px; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        input { width: 80px; }
+    </style>
+</head>
+<body>
+    <h2>Nutrition Information</h2>
+    <h3>Fill out details and press 'Export as SVG'</h3>
+    <label>Servings per package: <input type="number" id="servingsPerPackage" value="1"></label><br>
+    <label>Serving size (g): <input type="number" id="servingSize" value="100" oninput="updateTable()"></label>
+    <hr>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Nutrient</th>
+                <th>Unit</th>
+                <th>Per Serving</th>
+                <th>Per 100g</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="4"><hr></td></tr>
+            <tr class="nutrient-row">
+                <td><input type="text" class="nutrient-name" value="Energy"></td>
+                <td><input type="text" class="unit-input" value="kJ"></td>
+                <td class="per-serving">0</td>
+                <td><input type="number" class="per-100g-input" value="0" oninput="updateTable()"></td>
+                
+            </tr>
+            <tr class="nutrient-row">
+                <td><input type="text" class="nutrient-name" value="Protein"></td>
+                <td><input type="text" class="unit-input" value="g"></td>
+                <td class="per-serving">0</td>
+                <td><input type="number" class="per-100g-input" value="0" oninput="updateTable()"></td>
+                
+            </tr>
+            <tr class="nutrient-row">
+                <td><input type="text" class="nutrient-name" value="Fat, total"></td>
+                <td><input type="text" class="unit-input" value="g"></td>
+                <td class="per-serving">0</td>
+                <td><input type="number" class="per-100g-input" value="0" oninput="updateTable()"></td>
+                
+            </tr>
+            <tr class="nutrient-row">
+                <td><input type="text" class="nutrient-name" value="  - saturated"></td>
+                <td><input type="text" class="unit-input" value="g"></td>
+                <td class="per-serving">0</td>
+                <td><input type="number" class="per-100g-input" value="0" oninput="updateTable()"></td>
+                
+            </tr>
+            <tr class="nutrient-row">
+                <td><input type="text" class="nutrient-name" value="Carbohydrate"></td>
+                <td><input type="text" class="unit-input" value="g"></td>
+                <td class="per-serving">0</td>
+                <td><input type="number" class="per-100g-input" value="0" oninput="updateTable()"></td>
+                
+            </tr>
+            <tr class="nutrient-row">
+                <td><input type="text" class="nutrient-name" value="  - sugars"></td>
+                <td><input type="text" class="unit-input" value="g"></td>
+                <td class="per-serving">0</td>
+                <td><input type="number" class="per-100g-input" value="0" oninput="updateTable()"></td>
+                
+            </tr>  
+            <tr class="nutrient-row">
+                <td><input type="text" class="nutrient-name" value="Sodium"></td>
+                <td><input type="text" class="unit-input" value="mg"></td>
+                <td class="per-serving">0</td>
+                <td><input type="number" class="per-100g-input" value="0" oninput="updateTable()"></td>
+            </tr>
+            
+        </tbody>
+    </table>
+    <button onclick="exportSVG()">Export as SVG</button>
+</body>
+</html>
