@@ -18,8 +18,7 @@
 
         function exportSVG() {
             let svgContent = `<?xml version="1.0" encoding="UTF-8"?>
-            <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">
-                <rect width="400" height="300" fill="white" stroke="black" stroke-width="2" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" style="background: transparent;">
                 <text x="50%" y="30" font-family="Arial" font-size="16" font-weight="bold" fill="black" text-anchor="middle">Nutrition Information</text>
                 <text x="20" y="60" font-family="Arial" font-size="14">Servings per package: ${document.getElementById('servingsPerPackage').value}</text>
                 <text x="20" y="80" font-family="Arial" font-size="14">Serving size: ${document.getElementById('servingSize').value}g</text>
@@ -41,7 +40,7 @@
                 let perServing = row.querySelector('.per-serving').textContent;
                 
                 svgContent += `
-                <text x="20" y="${yPosition}" font-family="Arial" font-size="14">${nutrient}</text>
+                <text x="20" y="${yPosition}" font-family="Arial" font-weight="bold" font-size="14">${nutrient}</text>
                 <text x="150" y="${yPosition}" font-family="Arial" font-size="14">${perServing} ${unit}</text>
                 <text x="270" y="${yPosition}" font-family="Arial" font-size="14">${per100g} ${unit}</text>
                 `;
