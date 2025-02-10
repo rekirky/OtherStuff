@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nutrition Info Generator</title>
+    <script>
+        function handleFileUpload() {
+            let fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) {
+                alert("Please select a file.");
+                return;
+            }
+
+            let file = fileInput.files[0];
+            let reader = new FileReader();
+
+            reader.onload = function (e) {
+                try {
+                    let jsonData = JSON.parse(e.target.result);
+                    let recipe = jsonData[0][0]; // Extract main recipe
+                    let nipData = JSON.parse(recipe.nip); // Parse nutrition info
+
+                    let servingsPerPackage = parseFloat(nipData.SERVESPERPACKAGE);
+                    let servingSize = parseFloat(nipData.SERVESIZE);
+                    let totalWeight = servingsPerPackage * servingSize;
+
+                    document.getElementById("servingsPerPackage").textContent = servingsPerPackage;
+                    document.getElementById("servingSize").textContent = servingSize.toFixed(0) + " g";
+
+                    let nutrients = ["ENERGY", "PROTEIN", "FAT", "SATURATED", "CARBOHYDRATE", "SUGARS", "SODIUM"];
+                    let totals = { ENERGY: 0, PROTEIN: 0, FAT: 0, SATURATED: 0, CARBOHYDRATE: 0, SUGARS: 0, SODIUM: 0 };
+
+                    let ingredients = JSON.parse(recipe.ingredients);
+
+                    ingredients.forEach(ingredient => {
+                        nutrients.forEach(nutrient => {
+                            totals[nutrient] += (parseFloat(ingredient[nutrient]) * parseFloat(ingredient.AMOUNT)) / totalWeight;
+                        });
+                    });
+
+                    let units = { ENERGY: "kJ", PROTEIN: "g", FAT: "g", SATURATED: "g", CARBOHYDRATE: "g", SUGARS: "g", SODIUM: "mg" };
+                    
+                    nutrients.forEach(nutrient => {
+                        let nutrientId = nutrient.toLowerCase();
+                        document.getElementById(nutrientId + "-per100g").textContent = totals[nutrient].toFixed(1) + " " + units[nutrient];
+                        let perServing = (totals[nutrient] * servingSize / 100).toFixed(1);
+                        document.getElementById(nutrientId + "-perserving").textContent = perServing + " " + units[nutrient];
+                    });
+
+                } catch (error) {
+                    alert("Error processing file. Ensure it's a valid JSON file.");
+                    console.error(error);
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        function exportSVG() {
+            let svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+            <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" style="background: transparent;">
+                <text x="50%" y="30" font-family="Arial" font-size="16" font-weight="bold" fill="black" text-anchor="middle">Nutrition Information</text>
+                <text x="20" y="60" font-family="Arial" font-size="14">Servings per package: ${document.getElementById('servingsPerPackage').textContent}</text>
+                <text x="20" y="80" font-family="Arial" font-size="14">Serving size: ${document.getElementById('servingSize').textContent}</text>
+                <line x1="20" y1="85" x2="380" y2="85" stroke="black" stroke-width="1" />
+                <text x="20" y="110" font-family="Arial" font-size="14" font-weight="bold">Nutrient</text>
+                <text x="150" y="110" font-family="Arial" font-size="14" font-weight="bold">Avg. Quantity</text>
+                <text x="270" y="110" font-family="Arial" font-size="14" font-weight="bold">Avg. Quantity</text>
+                
+                <text x="150" y="125" font-family="Arial" font-size="14" font-weight="bold">Per Serving</text>
+                <text x="270" y="125" font-family="Arial" font-size="14" font-weight="bold">Per 100g</text>
+                <line x1="20" y1="135" x2="380" y2="135" stroke="black" stroke-width="1" />
+            `;
+            
+            let yPosition = 150;
+            let nutrients = ["energy", "protein", "fat", "saturated", "carbohydrate", "sugars", "sodium"];
+            let labels = ["Energy", "Protein", "Fat, total", " -Saturated Fat", "Carbohydrate", " -Sugars", "Sodium"];
+
+            nutrients.forEach((nutrient, index) => {
+                let per100g = document.getElementById(nutrient + "-per100g").textContent;
+                let perServing = document.getElementById(nutrient + "-perserving").textContent;
+                svgContent += `
+                <text x="20" y="${yPosition}" font-family="Arial" font-weight="bold" font-size="14">${labels[index]}</text>
+                <text x="270" y="${yPosition}" font-family="Arial" font-size="14">${per100g}</text>
+                <text x="150" y="${yPosition}" font-family="Arial" font-size="14">${perServing}</text>
+                `;
+                yPosition += 20;
+            });
+
+            svgContent += "</svg>";
+
+            let blob = new Blob([svgContent], { type: "image/svg+xml" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "nutrition_info.svg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</head>
+<body>
+    <h2>Upload Nutritional Data</h2>
+    <input type="file" id="fileInput" accept=".txt">
+    <button onclick="handleFileUpload()">Process File</button>
+    <h3>Nutrition Information</h3>
+    <p>Servings per package: <span id="servingsPerPackage">-</span></p>
+    <p>Serving size: <span id="servingSize">-</span></p>
+    <ul>
+        <li>Energy: <span id="energy-per100g">-</span> (Per 100g) | <span id="energy-perserving">-</span> (Per Serving)</li>
+        <li>Protein: <span id="protein-per100g">-</span> (Per 100g) | <span id="protein-perserving">-</span> (Per Serving)</li>
+        <li>Fat (Total): <span id="fat-per100g">-</span> (Per 100g) | <span id="fat-perserving">-</span> (Per Serving)</li>
+        <li>Saturated Fat: <span id="saturated-per100g">-</span> (Per 100g) | <span id="saturated-perserving">-</span> (Per Serving)</li>
+        <li>Carbohydrate: <span id="carbohydrate-per100g">-</span> (Per 100g) | <span id="carbohydrate-perserving">-</span> (Per Serving)</li>
+        <li>Sugars: <span id="sugars-per100g">-</span> (Per 100g) | <span id="sugars-perserving">-</span> (Per Serving)</li>
+        <li>Sodium: <span id="sodium-per100g">-</span> (Per 100g) | <span id="sodium-perserving">-</span> (Per Serving)</li>
+    </ul>
+    <button onclick="exportSVG()">Export as SVG</button>
+</body>
+</html>
